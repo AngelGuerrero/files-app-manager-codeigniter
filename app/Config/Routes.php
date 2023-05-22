@@ -44,7 +44,21 @@ $routes->delete('/users/delete/(:num)', 'UsersController::delete/$1');
 // Rutas para iniciar sesión
 $routes->post('/auth/login', 'AuthController::login');
 // Ruta para cerrar sesión
-$routes->get('/auth/logout', 'AuthController::logout');
+$routes->post('/auth/logout', 'AuthController::logout');
+
+// Rutas para mostrar el panel de control
+$routes->get('/panel', 'PanelController::index');
+// Ruta para subir una imagen
+$routes->post('/panel/upload', 'PanelController::uploadImage');
+// Ruta para eliminar una imagen
+$routes->post('/panel/delete', 'PanelController::deleteImage');
+
+// Rutas para crear documentos word, excel y pdf
+$routes->get('/documents', 'DocumentsController::index');
+// Ruta para crear documentos a word, excel y pdf
+$routes->post('/documents/generate', 'DocumentsController::generateDocuments');
+// Ruta para eliminar un documento seleccionado
+$routes->post('/documents/delete', 'DocumentsController::deleteDocument');
 
 /*
  * --------------------------------------------------------------------

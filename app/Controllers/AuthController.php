@@ -19,9 +19,10 @@ class AuthController extends BaseController
                 // inicia una sesión y guarda el nombre de usuario en las cookies
                 $session = session();
                 $session->set('user', $user['name']);
+                $session->set('isLoggedIn', true);
 
                 // redirige a la página de inicio
-                return redirect()->to('/')->with('message', 'Sesión iniciada correctamente');
+                return redirect()->to('/panel')->with('message', 'Sesión iniciada correctamente');
             } else {
                 // si no existe, muestra un mensaje de error
                 return redirect()->back()->with('error', 'Contraseña incorrecta');
