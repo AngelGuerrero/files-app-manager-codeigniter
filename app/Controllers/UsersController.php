@@ -41,7 +41,7 @@ class UsersController extends BaseController
             'password' => $password,
         ]);
 
-        return redirect()->to('user\user_list')->with('message', 'Usuario creado correctamente');
+        return redirect()->to('/')->with('message', 'Usuario creado correctamente');
     }
 
     /**
@@ -52,6 +52,6 @@ class UsersController extends BaseController
         $userModel = new UserModel();
         $userModel->delete($id);
 
-        return redirect()->to('user\user_list')->with('message', 'Usuario eliminado correctamente');
+        return redirect()->to('/')->with('message', 'Usuario eliminado correctamente');
     }
 }
