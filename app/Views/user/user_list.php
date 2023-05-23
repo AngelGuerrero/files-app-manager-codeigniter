@@ -1,56 +1,51 @@
-<?= view('partials/user_panel_header.php'); ?>
+<?= $this->extend('default'); ?>
 
-<main class="main">
-  <h1>Listado de Usuarios</h1>
+<?= $this->section('main'); ?>
+<section class="border rounded shadow-md w-[80%] max-w-[800px] bg-white p-5">
+  <h1 class="text-2xl font-bold mb-3">Listado de Usuarios</h1>
 
-  <!-- muestra mensaje -->
-  <?php if (session()->has('message')): ?>
-    <p style="color: green;">
-      <?php echo session('message'); ?>
-    </p>
-  <?php elseif (session()->has('error')): ?>
-    <p style="color: red;">
-      <?php echo session('error'); ?>
-    </p>
-  <?php endif ?>
-
-  <div class="container">
+  <article class="shadow p-3 rounded">
     <?php if (isset($users) && !empty($users)): ?>
-      <table class="users__table">
-        <thead class="users__thead">
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Correo Electrónico</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody class="users__tbody">
-          <?php foreach ($users as $user): ?>
-            <tr>
-              <td>
-                <?= $user['id']; ?>
-              </td>
-              <td>
-                <?= $user['name']; ?>
-              </td>
-              <td>
-                <?= $user['email']; ?>
-              </td>
-              <td>
+      <div class="">
+        <div class="flex w-full justify-around bg-blue-700 rounded p-2 text-white font-bold">
+          <div>ID</div>
+          <div>Nombre</div>
+          <div>Correo Electrónico</div>
+          <?php if ($isAdministrator): ?>
+            <div>Acciones</div>
+          <?php endif; ?>
+        </div>
+
+        <?php foreach ($users as $user): ?>
+          <div class="flex w-full justify-around bg-white rounded p-2 text-black text-center">
+            <div>
+              <?= $user['id']; ?>
+            </div>
+            <div>
+              <?= $user['name']; ?>
+            </div>
+            <div>
+              <?= $user['email']; ?>
+            </div>
+            <?php if ($isAdministrator): ?>
+              <div>
                 <form action="users/delete/<?= $user['id']; ?>" method="post">
                   <input type="hidden" name="_method" value="DELETE" />
-                  <input type="submit" value="Eliminar" />
+                  <input type="submit" value="Eliminar"
+                      disabled="<?= $user['id'] == session()->get('user_id') ? 'disabled' : ''; ?>"
+                      class="<?=
+                        $user['id'] === session()->get('user_id')
+                        ? 'px-3 py-1 border border-gray-500 text-gray-500 border-1 border-gray-300 rounded'
+                        : 'px-3 py-1 border border-red-500 text-red-500 border-1 border-red-300 rounded hover:bg-red-500 hover:text-white'; ?>" />
                 </form>
-              </td>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
+              </div>
+            <?php endif; ?>
+          </div>
+        <?php endforeach; ?>
+      </div>
     <?php else: ?>
       <p>No hay usuarios registrados.</p>
     <?php endif; ?>
-</main>
-</div>
-
-<?= view('partials/user_panel_footer.php'); ?>
+  </article>
+</section>
+<?= $this->endSection(); ?>

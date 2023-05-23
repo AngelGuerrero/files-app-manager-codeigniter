@@ -13,6 +13,8 @@ class UsersController extends BaseController
     {
         $userModel = new UserModel();
         $data['users'] = $userModel->findAll();
+        $user_id = session()->get('user_id');
+        $data['isAdministrator'] = UserModel::isAdministrator(session()->get('user_id'));
 
         return view('user\user_list', $data);
     }
@@ -51,7 +53,9 @@ class UsersController extends BaseController
     {
         $userModel = new UserModel();
         $userModel->delete($id);
+        $data['message'] = 'Usuario eliminado correctamente';
+        $data['route'] = 'user\user_list';
 
-        return redirect()->to('/')->with('message', 'Usuario eliminado correctamente');
+        return view('panel\panel', $data);
     }
 }

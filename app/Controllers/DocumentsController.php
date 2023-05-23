@@ -5,7 +5,6 @@ namespace App\Controllers;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\IOFactory;
 use TCPDF;
 
 class DocumentsController extends BaseController
@@ -14,7 +13,12 @@ class DocumentsController extends BaseController
   public function index()
   {
     // Listar todos los documentos de tipo word, excel y pdf
-    $directory_path = ROOTPATH . 'public/uploads';
+    $user_id = session()->get('user_id');
+
+    $directory_path = ROOTPATH . 'public/uploads' . '/' . $user_id . '/';
+    if (!file_exists($directory_path)) {
+      mkdir($directory_path, 0777, true);
+    }
     $documents = [];
     $directory = new \DirectoryIterator($directory_path);
 
@@ -38,10 +42,13 @@ class DocumentsController extends BaseController
     $age = $this->request->getPost('age');
     $city = $this->request->getPost('city');
 
+    // Obtiene el id del usuario para guardarlo en su carpeta
+    $user_id = session()->get('user_id');
+
     // Generar el documento de word
-    $this->generateWordDocument($name, $age, $city);
-    $this->generateExcelDocument($name, $age, $city);
-    $this->generatePdfDocument($name, $age, $city);
+    $this->generateWordDocument($name, $age, $city, $user_id);
+    $this->generateExcelDocument($name, $age, $city, $user_id);
+    $this->generatePdfDocument($name, $age, $city, $user_id);
 
     return redirect()->to('/documents')->with('message', 'Documentos creados correctamente');
   }
@@ -60,7 +67,7 @@ class DocumentsController extends BaseController
     return redirect()->to('/documents')->with('message', 'Documento eliminado correctamente');
   }
 
-  private function generateWordDocument($name, $age, $city)
+  private function generateWordDocument($name, $age, $city, $user_id)
   {
     // Cargar el archivo de autoloading de Composer
     require_once APPPATH . '../vendor/autoload.php';
@@ -77,13 +84,17 @@ class DocumentsController extends BaseController
     $section->addText("Ciudad: $city");
 
     // Guardar el documento en el servidor
+    $file_path = ROOTPATH . 'public/uploads/' . $user_id;
+    if (!file_exists($file_path)) {
+      mkdir($file_path, 0777, true);
+    }
     $random = rand(0, 1000);
-    $file_path = ROOTPATH . 'public/uploads/' . $random . '_documento.docx';
+    $file_path .= '/' . $random . '_documento.docx';
 
     $result = $phpWord->save($file_path, 'Word2007');
   }
 
-  private function generateExcelDocument($name, $age, $city)
+  private function generateExcelDocument($name, $age, $city, $user_id)
   {
     // Crear una instancia de Spreadsheet
     $spreadsheet = new Spreadsheet();
@@ -102,13 +113,16 @@ class DocumentsController extends BaseController
 
     // Descargar el documento en el navegador
     $writer = new Xlsx($spreadsheet);
-
+    $file_path = ROOTPATH . 'public/uploads/' . $user_id;
+    if (!file_exists($file_path)) {
+      mkdir($file_path, 0777, true);
+    }
     $random = rand(0, 1000);
-    $file_path = ROOTPATH . 'public/uploads/' . $random . '_documento.xlsx';
+    $file_path .= '/' . $random . '_documento.xlsx';
     $writer->save($file_path);
   }
 
-  private function generatePdfDocument($name, $age, $city)
+  private function generatePdfDocument($name, $age, $city, $user_id)
   {
     // Crear una instancia de TCPDF
     $pdf = new TCPDF();
@@ -130,7 +144,11 @@ class DocumentsController extends BaseController
 
     // Guardar el PDF en el servidor
     $random = rand(0, 1000);
-    $file_path = ROOTPATH . 'public/uploads/' . $random . '_documento.pdf';
+    $file_path = ROOTPATH . 'public/uploads/' . $user_id;
+    if (!file_exists($file_path)) {
+      mkdir($file_path, 0777, true);
+    }
+    $file_path .= '/' . $random . '_documento.pdf';
     $pdf->Output($file_path, 'F');
   }
 

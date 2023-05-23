@@ -26,7 +26,10 @@
             <a href="<?php echo base_url('/documents') ?>"
                 class="bg-black text-indigo-300 px-5 flex items-center hover:bg-indigo-500 hover:text-white font-bold">Crear
               archivos word, excel y pdf</a>
-          </div>
+            <a href="<?php echo base_url('/users') ?>"
+                class="bg-black text-indigo-300 px-5 flex items-center hover:bg-indigo-500 hover:text-white font-bold">Tabla de usuarios</a>
+          
+             </div>
         </div>
 
         <div class="flex items-center justify-center">

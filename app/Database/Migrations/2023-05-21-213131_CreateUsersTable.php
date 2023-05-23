@@ -27,6 +27,10 @@ class CreateUsersTable extends Migration
                 'type' => 'VARCHAR',
                 'constraint' => '100',
             ],
+            'isAdministrator' => [
+                'type' => 'BOOLEAN',
+                'default' => false,
+            ],
         ]);
 
         $this->forge->addKey('id', true);

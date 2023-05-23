@@ -19,6 +19,7 @@ class AuthController extends BaseController
                 // inicia una sesión y guarda el nombre de usuario en las cookies
                 $session = session();
                 $session->set('user', $user['name']);
+                $session->set('user_id', $user['id']);
                 $session->set('isLoggedIn', true);
 
                 // redirige a la página de inicio

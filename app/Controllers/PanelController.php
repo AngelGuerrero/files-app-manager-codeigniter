@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\UserModel;
+
 class PanelController extends BaseController
 {
 
@@ -12,9 +14,20 @@ class PanelController extends BaseController
     $images = [];
     $directory = new \DirectoryIterator($directory_path);
 
+    $user_id = session()->get('user_id');
+    $isAdministrator = UserModel::isAdministrator($user_id);
+
     foreach ($directory as $file) {
       if ($file->isFile() && $this->isImage($file->getExtension())) {
-        $images[] = $file->getFilename();
+        $file_name = $file->getFilename();
+        $split_name = explode('@', $file_name);
+        $file_user_id = $split_name[0];
+
+        if ($isAdministrator) {
+          $images[] = $file->getFilename();
+        } else if ($user_id == $file_user_id) {
+          $images[] = $file->getFilename();
+        }
       }
     }
 
@@ -32,23 +45,25 @@ class PanelController extends BaseController
       'image' => 'uploaded[image]|mime_in[image,image/jpg,image/jpeg,image/png]'
     ];
 
-    if ($this->validate($validationRules)) {
-      // Si la validación es exitosa, procede a cargar la imagen
-      $image = $this->request->getFile('image');
-
-      // Genera un nombre único para la imagen
-      $image_name = $image->getRandomName();
-
-      // Mueve la imagen al directorio de destino
-      $image->move(ROOTPATH . 'public/uploads', $image_name);
-
-      // Redirige o muestra un mensaje de éxito
-      return redirect()->to('/panel')->with('message', 'Imagen cargada correctamente');
-    } else {
+    if (!$this->validate($validationRules)) {
       // Si la validación falla, muestra los errores
       $data['validation'] = $this->validator;
       return redirect()->to('/panel')->with('error', $data['validation']->listErrors());
     }
+
+    $user_id = session()->get('user_id');
+
+    // Si la validación es exitosa, procede a cargar la imagen
+    $image = $this->request->getFile('image');
+
+    // Genera un nombre único para la imagen
+    $image_name = $user_id . '@' . $image->getRandomName();
+
+    // Mueve la imagen al directorio de destino
+    $image->move(ROOTPATH . 'public/uploads', $image_name);
+
+    // Redirige o muestra un mensaje de éxito
+    return redirect()->to('/panel')->with('message', 'Imagen cargada correctamente');
   }
 
   public function deleteImage()
