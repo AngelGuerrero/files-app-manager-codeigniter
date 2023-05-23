@@ -56,6 +56,6 @@ class UsersController extends BaseController
         $data['message'] = 'Usuario eliminado correctamente';
         $data['route'] = 'user\user_list';
 
-        return view('panel\panel', $data);
+        return redirect()->to('/users')->with('message', 'Usuario eliminado correctamente');
     }
 }

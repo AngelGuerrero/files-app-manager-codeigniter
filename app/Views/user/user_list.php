@@ -31,8 +31,8 @@
               <div>
                 <form action="users/delete/<?= $user['id']; ?>" method="post">
                   <input type="hidden" name="_method" value="DELETE" />
-                  <input type="submit" value="Eliminar"
-                      disabled="<?= $user['id'] == session()->get('user_id') ? 'disabled' : ''; ?>"
+                  <input type="submit" value="Eliminar" <?php if ($user['id'] == session()->get('user_id'))
+                    echo 'disabled="disabled"'; ?>
                       class="<?=
                         $user['id'] === session()->get('user_id')
                         ? 'px-3 py-1 border border-gray-500 text-gray-500 border-1 border-gray-300 rounded'
