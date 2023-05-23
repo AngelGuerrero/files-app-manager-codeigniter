@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\UserModel;
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
@@ -54,5 +55,51 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
 
         // E.g.: $this->session = \Config\Services::session();
+    }
+
+    protected function onGetUserFilesList($fileType)
+    {
+        $files = [];
+        $directory_path = ROOTPATH . 'public/uploads';
+        $directory = new \DirectoryIterator($directory_path);
+
+        $user_id = session()->get('user_id');
+        $isAdministrator = UserModel::isAdministrator($user_id);
+
+        $getType = function ($fileType, $file) {
+            if ($fileType == 'image') {
+                return $this->isImage($file->getExtension());
+            } else if ($fileType == 'document') {
+                return $this->isDocument($file->getExtension());
+            }
+        };
+
+        foreach ($directory as $file) {
+            if ($file->isFile() && $getType($fileType, $file)) {
+                $file_name = $file->getFilename();
+                $split_name = explode('@', $file_name);
+                $file_user_id = $split_name[0];
+
+                if ($isAdministrator || $user_id == $file_user_id) {
+                    $files[] = $file->getFilename();
+                }
+            }
+        }
+
+        return $files;
+    }
+
+    protected function isImage($extension)
+    {
+        $allowedExts = ['jpg', 'jpeg', 'png', 'gif'];
+
+        return in_array(strtolower($extension), $allowedExts);
+    }
+
+    protected function isDocument($extension)
+    {
+        $documents = ['docx', 'xlsx', 'pdf'];
+
+        return in_array($extension, $documents);
     }
 }

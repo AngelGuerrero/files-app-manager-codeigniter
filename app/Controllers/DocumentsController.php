@@ -9,27 +9,10 @@ use TCPDF;
 
 class DocumentsController extends BaseController
 {
-
   public function index()
   {
-    // Listar todos los documentos de tipo word, excel y pdf
-    $user_id = session()->get('user_id');
-
-    $directory_path = ROOTPATH . 'public/uploads' . '/' . $user_id . '/';
-    if (!file_exists($directory_path)) {
-      mkdir($directory_path, 0777, true);
-    }
-    $documents = [];
-    $directory = new \DirectoryIterator($directory_path);
-
-    foreach ($directory as $file) {
-      if ($file->isFile() && $this->isDocument($file->getExtension())) {
-        $documents[] = $file->getFilename();
-      }
-    }
-
     // Pasar la lista de documentos a la vista
-    $data['documents'] = $documents;
+    $data['documents'] = $this->onGetUserFilesList('document');
     $data['route'] = 'documents/document_list';
 
     return view('panel\panel', $data);
@@ -84,12 +67,8 @@ class DocumentsController extends BaseController
     $section->addText("Ciudad: $city");
 
     // Guardar el documento en el servidor
-    $file_path = ROOTPATH . 'public/uploads/' . $user_id;
-    if (!file_exists($file_path)) {
-      mkdir($file_path, 0777, true);
-    }
     $random = rand(0, 1000);
-    $file_path .= '/' . $random . '_documento.docx';
+    $file_path = ROOTPATH . 'public/uploads/' . $user_id . '@' . $random . '_documento.docx';
 
     $result = $phpWord->save($file_path, 'Word2007');
   }
@@ -113,12 +92,8 @@ class DocumentsController extends BaseController
 
     // Descargar el documento en el navegador
     $writer = new Xlsx($spreadsheet);
-    $file_path = ROOTPATH . 'public/uploads/' . $user_id;
-    if (!file_exists($file_path)) {
-      mkdir($file_path, 0777, true);
-    }
     $random = rand(0, 1000);
-    $file_path .= '/' . $random . '_documento.xlsx';
+    $file_path = ROOTPATH . 'public/uploads/' . $user_id . '@' . $random . '_documento.xlsx';
     $writer->save($file_path);
   }
 
@@ -144,18 +119,7 @@ class DocumentsController extends BaseController
 
     // Guardar el PDF en el servidor
     $random = rand(0, 1000);
-    $file_path = ROOTPATH . 'public/uploads/' . $user_id;
-    if (!file_exists($file_path)) {
-      mkdir($file_path, 0777, true);
-    }
-    $file_path .= '/' . $random . '_documento.pdf';
+    $file_path = ROOTPATH . 'public/uploads/' . $user_id . '@' . $random . '_documento.pdf';
     $pdf->Output($file_path, 'F');
-  }
-
-  private function isDocument($extension)
-  {
-    $documents = ['docx', 'xlsx', 'pdf'];
-
-    return in_array($extension, $documents);
   }
 }
